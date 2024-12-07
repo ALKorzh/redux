@@ -59,7 +59,8 @@ export const saveNote = async (note) => {
 };
 
 // Функция для обновления заметки
+
 export const updateNote = async (note) => {
   const url = `${API_URL}/notes/${note.id}`;
-  return await apiRequest('put', url, note); // Возвращаем обновленную заметку с сервера
+  return await apiRequest('put', url, note); // Отправляем PUT запрос на обновление заметки
 };

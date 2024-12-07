@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { saveNote } from '../services/noteService'; // Этот метод должен работать с обновлением заметки
+import { updateNote } from '../services/noteService'; // Импортируем функцию для обновления заметки
 import { setNotes } from '../redux/actions/noteActions'; // Для обновления состояния заметок
 
 function EditNote() {
@@ -32,17 +32,22 @@ function EditNote() {
     const updatedNote = {
       ...note,
       id: parseInt(id),
-      userId: JSON.parse(localStorage.getItem('user')).id, // Обновляем userId
+      userId: JSON.parse(localStorage.getItem('user')).id,
     };
 
-    // Сохраняем обновленную заметку на сервере
-    await saveNote(updatedNote);
+    try {
+      // Обновляем заметку на сервере
+      await updateNote(updatedNote);
 
-    // Обновляем заметку в Redux
-    dispatch(setNotes(notes.map((n) => (n.id === updatedNote.id ? updatedNote : n))));
+      // Обновляем заметку в Redux
+      dispatch(setNotes(notes.map((n) => (n.id === updatedNote.id ? updatedNote : n))));
 
-    // После сохранения возвращаемся на страницу со всеми заметками
-    navigate('/notes');
+      // После сохранения возвращаемся на страницу со всеми заметками
+      navigate('/notes');
+    } catch (error) {
+      console.error('Error updating note:', error);
+      alert('Error updating note!');
+    }
   };
 
   return (

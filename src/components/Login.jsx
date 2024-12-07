@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '../redux/actions/authActions';
 import { getUserFromLocalStorage } from '../services/userService'; // Импортируем функцию из services
+import { checkUserCredentials } from '../services/userService'; // Импортируем функцию для запроса на сервер
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -27,7 +28,7 @@ function Login() {
     }
   }, [user]); // Зависимость от user
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Получаем данные для проверки логина из localStorage
     const storedUser = getUserFromLocalStorage();
 
@@ -45,8 +46,23 @@ function Login() {
       // Перенаправляем на страницу home
       navigate('/home');
     } else {
-      console.log('Invalid login credentials');
-      setError('Invalid email or password'); // Выводим ошибку, если данные не совпадают
+      // Если данные не найдены в localStorage, отправляем запрос на сервер
+      try {
+        const userFromServer = await checkUserCredentials(email, password);
+
+        if (userFromServer) {
+          // Если учетные данные верны, сохраняем пользователя в Redux
+          dispatch(setUser(userFromServer));
+
+          // Перенаправляем на страницу home
+          navigate('/home');
+        } else {
+          setError('Invalid email or password'); // Ошибка, если данные неверные
+        }
+      } catch (error) {
+        console.error('Error during login:', error);
+        setError('Failed to authenticate. Please try again later.');
+      }
     }
   };
 
