@@ -32,7 +32,7 @@ function EditNote() {
     const updatedNote = {
       ...note,
       id: parseInt(id),
-      userId: JSON.parse(localStorage.getItem('user')).id,
+      userId: JSON.parse(localStorage.getItem('user')).id, // Обновляем userId
     };
 
     // Сохраняем обновленную заметку на сервере

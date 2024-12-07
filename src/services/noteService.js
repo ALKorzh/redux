@@ -31,7 +31,7 @@ const apiRequest = async (method, url, data = null) => {
 
 // Функция для получения заметок пользователя
 export const fetchNotes = async (userId) => {
-  const url = `${API_URL}/notes?userId=${userId}`; // Заменили authorId на userId
+  const url = `${API_URL}/notes?userId=${userId}`; // Фильтруем заметки по userId
   const data = await apiRequest('get', url);
   if (Array.isArray(data)) {
     return data; // Возвращаем данные с сервера
