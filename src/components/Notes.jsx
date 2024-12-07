@@ -24,21 +24,19 @@ function Notes() {
   }, [dispatch, navigate]);
 
   useEffect(() => {
-    if (user && notes.length === 0) {
-      // Загружаем заметки только если их еще нет
-      const loadNotes = async () => {
-        try {
-          setLoading(true); // Включаем флаг загрузки
-          const fetchedNotes = await fetchNotes(user.id);
-          dispatch(setNotes(fetchedNotes)); // Загружаем заметки
-        } catch (error) {
-          console.error('Error loading notes:', error);
-        } finally {
-          setLoading(false); // Выключаем флаг загрузки
-        }
-      };
-      loadNotes();
-    }
+    // Загружаем заметки только если их еще нет
+    const loadNotes = async () => {
+      try {
+        setLoading(true); // Включаем флаг загрузки
+        const fetchedNotes = await fetchNotes(user.id);
+        dispatch(setNotes(fetchedNotes)); // Загружаем заметки
+      } catch (error) {
+        console.error('Error loading notes:', error);
+      } finally {
+        setLoading(false); // Выключаем флаг загрузки
+      }
+    };
+    loadNotes();
   }, [dispatch, user, notes.length]); // Зависимость от notes.length
 
   const handleDelete = async (id) => {

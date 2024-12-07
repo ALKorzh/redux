@@ -21,7 +21,7 @@ function CreateNote() {
 
     const newNote = {
       ...note,
-      id: Date.now(),
+      id: `${Date.now()}`,
       userId: user.id, // Use userId from localStorage
     };
 

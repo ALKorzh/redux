@@ -1,49 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateNote } from '../services/noteService'; // Импортируем функцию для обновления заметки
-import { setNotes } from '../redux/actions/noteActions'; // Для обновления состояния заметок
+import { updateNote } from '../services/noteService';
+import { setNotes } from '../redux/actions/noteActions';
 
 function EditNote() {
-  const { id } = useParams(); // Получаем id заметки из параметров URL
+  const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { notes } = useSelector((state) => state.notes); // Получаем заметки из Redux
-  const noteToEdit = notes.find((note) => note.id === parseInt(id)); // Ищем заметку по id
+  const { notes } = useSelector((state) => state.notes);
+  const noteToEdit = notes.find((note) => note.id === id);
 
-  const [note, setNote] = useState({ title: '', content: '' }); // Инициализация состояния заметки
+  const [note, setNote] = useState({ title: '', content: '' });
 
   // Загружаем данные заметки, если она найдена
   useEffect(() => {
-    if (noteToEdit) {
-      if (noteToEdit.userId !== JSON.parse(localStorage.getItem('user')).id) {
-        navigate('/'); // Если userId не совпадает, перенаправляем на главную страницу
-      } else {
-        setNote({ title: noteToEdit.title, content: noteToEdit.content });
-      }
+    const userFromStorage = JSON.parse(localStorage.getItem('user'));
+    if (!userFromStorage || !noteToEdit || noteToEdit.userId !== userFromStorage.id) {
+      navigate('/'); // Если заметка не найдена или нет доступа, перенаправляем
     } else {
-      navigate('/'); // Если заметка не найдена, перенаправляем на главную страницу
+      setNote({ title: noteToEdit.title, content: noteToEdit.content });
     }
   }, [id, noteToEdit, navigate]);
 
-  // Сохраняем обновленную заметку
   const handleSave = async () => {
     const updatedNote = {
       ...note,
-      id: parseInt(id),
+      id: id,
       userId: JSON.parse(localStorage.getItem('user')).id,
     };
 
     try {
-      // Обновляем заметку на сервере
-      await updateNote(updatedNote);
+      await updateNote(updatedNote); // Обновляем заметку на сервере
 
-      // Обновляем заметку в Redux
-      dispatch(setNotes(notes.map((n) => (n.id === updatedNote.id ? updatedNote : n))));
+      dispatch(setNotes(notes.map((n) => (n.id === updatedNote.id ? updatedNote : n)))); // Обновляем заметку в Redux
 
-      // После сохранения возвращаемся на страницу со всеми заметками
-      navigate('/notes');
+      navigate('/notes'); // Перенаправляем на страницу заметок
     } catch (error) {
       console.error('Error updating note:', error);
       alert('Error updating note!');
