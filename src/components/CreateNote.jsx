@@ -10,16 +10,25 @@ function CreateNote() {
   const dispatch = useDispatch();
 
   const handleCreate = async () => {
+    const user = JSON.parse(localStorage.getItem('user')); // Get user data from localStorage
+
+    if (!user) {
+      // If no user data found, prompt user to log in
+      alert('You must be logged in to create a note');
+      navigate('/login'); // Redirect to login page
+      return;
+    }
+
     const newNote = {
       ...note,
       id: Date.now(),
-      userId: JSON.parse(localStorage.getItem('user')).id, // Получаем userId из localStorage
+      userId: user.id, // Use userId from localStorage
     };
 
-    // Сохраняем заметку через API
+    // Save the new note via API
     await saveNote(newNote);
 
-    // Обновляем состояние в Redux
+    // Update Redux state with new note
     dispatch(setNotes((prevNotes) => [...prevNotes, newNote]));
 
     navigate('/notes');

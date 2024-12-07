@@ -2,16 +2,24 @@
 // services/authService.js
 import axios from 'axios';
 
+const API_URL = 'http://localhost:5000'; // адрес json-server
+
 export const checkUserCredentials = async (email, password) => {
   try {
-    const response = await axios.post('/api/login', { email, password });
-    if (response.data) {
-      return response.data; // Возвращаем данные пользователя из ответа сервера
+    // Отправляем запрос на поиск пользователя по email
+    const response = await axios.get(`${API_URL}/users`, {
+      params: { email, password }, // параметры запроса
+    });
+
+    if (response.data.length > 0) {
+      // Если находим пользователя, возвращаем данные
+      return response.data[0]; // Возвращаем первого найденного пользователя
     }
-    return null;
+
+    return null; // Если не нашли, возвращаем null
   } catch (error) {
     console.error('Login request failed:', error);
-    throw error;
+    throw error; // Выкидываем ошибку
   }
 };
 

@@ -16,7 +16,7 @@ function Login() {
   useEffect(() => {
     // Если пользователь уже авторизован, перенаправляем на страницу home
     if (user) {
-      navigate('/home');
+      navigate('/');
     }
   }, [user, navigate]); // Зависимость только от user
 
@@ -29,35 +29,31 @@ function Login() {
   }, [user]); // Зависимость от user
 
   const handleLogin = async () => {
-    // Получаем данные для проверки логина из localStorage
-    const storedUser = getUserFromLocalStorage();
+    const storedUser = getUserFromLocalStorage(); // Check localStorage first
 
-    console.log('Stored user from localStorage:', storedUser); // Логируем данные из localStorage
-
-    // Проверяем, существуют ли данные для логина и совпадают ли данные
     if (
       storedUser &&
       storedUser.email.trim() === email.trim() &&
       storedUser.password === password
     ) {
-      // Сохраняем пользователя в Redux
+      // If user found in localStorage, store in Redux and navigate
       dispatch(setUser(storedUser));
-
-      // Перенаправляем на страницу home
       navigate('/home');
     } else {
-      // Если данные не найдены в localStorage, отправляем запрос на сервер
       try {
+        // If user not found in localStorage, check the server
         const userFromServer = await checkUserCredentials(email, password);
 
         if (userFromServer) {
-          // Если учетные данные верны, сохраняем пользователя в Redux
+          // Save user data to localStorage
+          localStorage.setItem('user', JSON.stringify(userFromServer));
+
+          // Save user to Redux
           dispatch(setUser(userFromServer));
 
-          // Перенаправляем на страницу home
           navigate('/home');
         } else {
-          setError('Invalid email or password'); // Ошибка, если данные неверные
+          setError('Invalid email or password');
         }
       } catch (error) {
         console.error('Error during login:', error);
